@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class Calculate extends Controller
+class CreateTable extends Controller
 {
-
+    //
 }
