@@ -53,6 +53,12 @@ Route::get('cr', [innertext::class, 'Migration']);
 
 Route::get('/page',[PageController::class, 'getIndex']);
 
+Route::get('/page',[PageController::class, 'getIndex']);
+
+Route::get('/detail/{id}',[PageController::class, 'getID']);
+
+Route::get('/type/{id}',[PageController::class, 'getTypeProducts']);
+
 
 
 
