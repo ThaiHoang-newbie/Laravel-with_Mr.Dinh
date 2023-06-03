@@ -114,7 +114,7 @@
 
 							<ul class="sub-menu">
 								@foreach ($type_pro as $t)
-								<li><a href="type/{{$t->id}}">{{$t->name}}</a></li>
+								<li><a href="/type/{{$t->id}}">{{$t->name}}</a></li>
 								@endforeach
 							</ul>
 
@@ -187,7 +187,7 @@
 									<div class="col-sm-4">
 										<div class="single-item">
 											<div class="single-item-header">
-												<a href="product.html"><img src="/source/image/product/{{$pro->image}}" alt=""></a>
+												<a href="/detail/{{$pro->id}}"><img src="/source/image/product/{{$pro->image}}" alt=""></a>
 											</div>
 											<div class="single-item-body">
 												<p class="single-item-title">{{$pro->name}}</p>
@@ -197,7 +197,7 @@
 											</div>
 											<div class="single-item-caption">
 												<a class="add-to-cart pull-left" href="shopping_cart.html"><i class="fa fa-shopping-cart"></i></a>
-												<a class="beta-btn primary" href="product.html">{{$pro->description}} <i class="fa fa-chevron-right"></i></a>
+												<a class="beta-btn primary" href="/detail/{{$pro->id}}">Detail<i class="fa fa-chevron-right"></i></a>
 												<div class="clearfix"></div>
 											</div>
 										</div>
@@ -224,7 +224,7 @@
 											</div>
 											<div class="single-item-caption">
 												<a class="add-to-cart pull-left" href="shopping_cart.html"><i class="fa fa-shopping-cart"></i></a>
-												<a class="beta-btn primary" href="/detail/{{$pro_else->id}}">{{$pro_else->description}} <i class="fa fa-chevron-right"></i></a>
+												<a class="beta-btn primary" href="/detail/{{$pro_else->id}}">Detail<i class="fa fa-chevron-right"></i></a>
 												<div class="clearfix"></div>
 											</div>
 										</div>
@@ -320,6 +320,7 @@
 	<script src="/source/assets/dest/rs-plugin/js/jquery.themepunch.revolution.min.js"></script>
 	<script src="/source/assets/dest/js/waypoints.min.js"></script>
 	<script src="/source/assets/dest/js/wow.min.js"></script>
+	
 	<!--customjs-->
 	<script src="/source/assets/dest/js/custom2.js"></script>
 	<script>

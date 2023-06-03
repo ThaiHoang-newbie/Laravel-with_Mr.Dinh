@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,9 +15,9 @@
 
     @for ($i = 0; $i < 2; $i++)
         @for ($j < 2; $j++)
-            {{ $arr[$j] }}
+            {{ $arr[$j] }};
         @endfor 
         <br>
     @endfor
 </body>
-</html>
+</html> --}}

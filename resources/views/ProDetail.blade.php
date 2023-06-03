@@ -13,6 +13,3 @@
     <span class="flash-sale"><b>${{$sanpham->promotion_price}}</b></span>
 </body>
 </html>
-        
-
-
