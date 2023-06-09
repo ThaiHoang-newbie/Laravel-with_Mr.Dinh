@@ -120,6 +120,7 @@ return [
     | will not be safe. Please do this before deploying an application!
     |
     */
+    'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
 
     'key' => env('APP_KEY'),
 
@@ -182,6 +183,9 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
+
+        
+
         /*
          * Package Service Providers...
          */
@@ -191,9 +195,9 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,  
 
     ],
 

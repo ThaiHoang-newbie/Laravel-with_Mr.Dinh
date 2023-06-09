@@ -77,4 +77,3 @@ Route::post('/admin-delete/{id}',[PageController::class,'postAdminDelete']);
 Route::get('admin-export',[PageController::class,'exportAdminProduct'])->name('export');
 
 
-
