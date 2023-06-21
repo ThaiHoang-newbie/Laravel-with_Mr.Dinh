@@ -3,60 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\bill_detail;
-use App\Models\slide;
+use App\Models\comments;
+use App\Models\Product;
 use App\Models\products;
+use App\Models\slide;
+use App\Models\slides;
+use App\Models\customer;
+use App\Models\wishlists;
+use App\Models\bills;
 use App\Models\type_products;
 use Illuminate\Http\Request;
-
+use App\Models\Cart;
+use Illuminate\Support\Facades\Session;
 class PageController extends Controller
 {
+
     public function getIndex()
     {
-        // Slide
-        $slide = Slide::all();
+        $slide = slides::all();
+        //return view('page.trangchu',['slide'=>$slide]);						
+        $new_product = products::where('new', 1)->paginate(8);
+        $sanpham_khuyenmai = products::where('promotion_price', '<>', 0)->paginate(4);
 
-        // All pro
-        $product = Products::all();
-
-        //New pro
-        $new_product = Products::where('new', 1)->get();
-
-        // Type pro
-        $type = type_products::all();
-
-
-        return view('trangchu', compact('slide', 'new_product', 'type', 'product'));
+        return view('page.trangchu', compact('slide', 'new_product', 'sanpham_khuyenmai'));
     }
 
-    public function getID(Request $request)
+    public function getDetail(Request $request)
     {
-        $sanpham = Products::where('id', $request->id)->first();
-        return view('ProDetail', compact('sanpham'));
+        $sanpham = products::where('id', $request->id)->first();
+        $splienquan = products::where('id', '<>', $sanpham->id, 'and', 'id_type', '=', $sanpham->id_type)->paginate(3);
+        $comments =    comments::where('id_product', $request->id)->get();
+        return view('page.chitiet_sanpham', compact('sanpham', 'splienquan', 'comments'));
     }
-
-
-    public function getADmin()
+    public function getLoaiSp($type)
     {
-        $spAdmin = Products::all();
-        return view('Admin', compact('spAdmin'));
+        $type_product = type_products::all(); //Show ra tên loại sản phẩm
+        $sp_theoloai = products::where('id_type', $type)->get();
+        $sp_khac = products::where('id_type', '<>', $type)->paginate(3);
+        return view('page.loai_sanpham', compact('sp_theoloai', 'type_product', 'sp_khac'));
     }
-
-
     public function getIndexAdmin()
     {
-        $product = Products::all();
-        return view('Admin')->with(['products' => $product, 'sumSold' => count(bill_detail::all())]);
+        $product = products::all();
+        return view('pageadmin.admin')->with(['products' => $product, 'sumSold' => count(bill_detail::all())]);
     }
-
-
     public function getAdminAdd()
     {
-        return view('formAdd');
+        return view('pageadmin.formAdd');
     }
 
     public function postAdminAdd(Request $request)
     {
-        $product = new Products();
+        $product = new products();
 
         if ($request->hasFile('inputImage')) {
             $file = $request->file('inputImage');
@@ -78,19 +76,21 @@ class PageController extends Controller
 
     public function postAdminDelete($id)
     {
-        $product = Products::find($id);
+        $product = products::find($id);
         $product->delete();
         return $this->getIndexAdmin();
     }
     public function getAdminEdit($id)
     {
-        $product = Products::find($id);
-        return view('f_edit')->with('product', $product);
+        $product = products::find($id);
+        return view('pageadmin.formEdit')->with('product', $product);
     }
+
+
     public function postAdminEdit(Request $request)
     {
         $id = $request->editId;
-        $product = Products::find($id);
+        $product = products::find($id);
 
         if ($request->hasFile('editImage')) {
             $file = $request->file('editImage');
@@ -111,85 +111,110 @@ class PageController extends Controller
     }
 
 
+      public function getAddToCart(Request $req, $id)																				
+      {																				
+        if (Session::has('user')) {																				
+          if (Products::find($id)) {																				
+            $product = Products::find($id);																				
+            $oldCart = Session('cart') ? Session::get('cart') : null;																				
+            $cart = new Cart($oldCart);																				
+            $cart->add($product, $id);																				
+            $req->session()->put('cart', $cart);																				
+            return redirect()->back();																				
+          } else {																				
+            return '<script>alert("Không tìm thấy sản phẩm này.");window.location.assign("/");</script>';																				
+          }																				
+        } else {																				
+          return '<script>alert("Vui lòng đăng nhập để sử dụng chức năng này.");window.location.assign("/login");</script>';																				
+        }																				
+      }																				
+                                                                                                                                                            
+    
+    public function getDelItemCart($id){
+        $oldCart = Session::has('cart')?Session::get('cart'):null;
+        $cart = new Cart($oldCart);
+        $cart->removeItem($id);
+        if(count($cart->items)>0){
+        Session::put('cart',$cart);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // View Product type
-    public function getTypeProducts($type)
-    {
-        // All type products
-        $type_pro = type_products::all();
-
-
-        // A type products
-        $typeID = type_products::where('id', $type)->first();
-
-
-        // Get all products in that type product
-        $product = Products::where('id_type', $type)->get();
-
-
-        // Else
-        $product_else = Products::where('id_type', '<>', $type)->get();
-
-        return view('Product_type', compact('type_pro', 'typeID', 'product', 'product_else'));
-    }
-
-
-
-
-
-
-
-
-
-    public function getProduct()
-    {
-        $products = Products::limit(5)->get();
-        return response()->json($products);
-    }
-
-    public function addProduct(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'unit_price' => 'required|numeric',
-            'image' => 'required',
-            'description' => 'required',
-        ]);
-
-        $product = new Products();
-        $product->name = $validatedData['name'];
-        $product->unit_price = $validatedData['unit_price'];
-        $product->image = $validatedData['image'];
-        $product->description = $validatedData['description'];
-
-
-        
-        try {
-            $product->save();
-            return response()->json(['message' => 'Product added successfully'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to save product'], 500);
         }
+        else{
+            Session::forget('cart');
+        }
+        return redirect()->back();
     }
+    
+    public function getCheckout()														
+    {														
+   if (Session::has('cart')) {														
+  $oldCart = Session::get('cart');														
+  $cart = new Cart($oldCart);														
+  return view('page.checkout')->with(['cart' => Session::get('cart'), 														
+      'product_cart' => $cart->items, 														
+      'totalPrice' => $cart->totalPrice, 														
+      'totalQty' => $cart->totalQty]);;														
+   } else {														
+  return redirect('trangchu');														
+   }														
+    }		
+												
+                                                          
+    public function postCheckout(Request $req)														
+    {														
+   $cart = Session::get('cart');														
+   $customer = new customer;														
+   $customer->name = $req->full_name;														
+   $customer->gender = $req->gender;														
+   $customer->email = $req->email;														
+   $customer->address = $req->address;														
+   $customer->phone_number = $req->phone;														
+                                                          
+   if (isset($req->notes)) {														
+  $customer->note = $req->notes;														
+   } else {														
+  $customer->note = "Không có ghi chú gì";														
+   }														
+                                                          
+   $customer->save();														
+                                                          
+   $bill = new bills;														
+   $bill->id_customer = $customer->id;														
+   $bill->date_order = date('Y-m-d');														
+   $bill->total = $cart->totalPrice;														
+   $bill->payment = $req->payment_method;														
+   if (isset($req->notes)) {														
+  $bill->note = $req->notes;														
+   } else {														
+  $bill->note = "Không có ghi chú gì";														
+   }														
+   $bill->save();	
+   													
+                                                          
+   foreach ($cart->items as $key => $value) {														
+  $bill_detail = new bill_detail;														
+  $bill_detail->id_bill = $bill->id;														
+  $bill_detail->id_product = $key; //$value['item']['id'];														
+  $bill_detail->quantity = $value['qty'];														
+  $bill_detail->unit_price = $value['price'] / $value['qty'];														
+  $bill_detail->save();														
+   }														
+                                                          
+   Session::forget('cart');														
+   $wishlists = wishlists::where('id_user', Session::get('user')->id)->get();														
+   if (isset($wishlists)) {														
+  foreach ($wishlists as $element) {														
+   $element->delete();														
+  }
+  
+  
+  
+}
+    
+  
+ }
+      
+    
+
+
+
 }

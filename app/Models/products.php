@@ -8,9 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class products extends Model
 {
     use HasFactory;
-    protected $table = "products";
-
-    public function comments(){
-        return $this -> hasMany('App\products');
-    }
+    protected $table ='products';
 }
